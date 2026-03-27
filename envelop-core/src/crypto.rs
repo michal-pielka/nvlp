@@ -33,3 +33,7 @@ fn parse_recipients(public_keys: &[&str]) -> Result<Vec<SshRecipient>, ParseReci
         .map(|&key| key.parse::<SshRecipient>())
         .collect()
 }
+
+fn parse_identity(private_key: &str) -> Result<SshIdentity, std::io::Error> {
+    SshIdentity::from_buffer(private_key.as_bytes(), None)
+}
