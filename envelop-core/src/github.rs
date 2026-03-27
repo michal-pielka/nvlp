@@ -22,8 +22,8 @@ pub fn fetch_public_keys(username: &str) -> Result<Vec<String>, Box<dyn std::err
 
 #[derive(Deserialize)]
 pub struct Gist {
-    id: String,
-    html_url: String,
+    pub id: String,
+    pub html_url: String,
 }
 
 // TODO: error handling
@@ -43,6 +43,7 @@ pub fn create_gist(
     let resp = client
         .post(create_gist_url)
         .json(&body)
+        .header("User-Agent", "envelop")
         .header("Accept", "application/vnd.github+json")
         .header("Authorization", format!("Bearer {token}"))
         .header("X-GitHub-Api-Version", "2026-03-10")
