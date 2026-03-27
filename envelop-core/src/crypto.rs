@@ -23,8 +23,9 @@ pub fn encrypt(
 pub fn decrypt(
     ciphertext: &[u8],
     private_key: &str,
+    private_key_filename: Option<&str>,
 ) -> Result<Vec<u8>, Box<dyn std::error::Error>> {
-    let identity = parse_identity(private_key).map_err(|_e| "TODO: Custom error")?;
+    let identity = parse_identity(private_key, private_key_filename).map_err(|_e| "TODO: Custom error")?;
 
     let decryptor = Decryptor::new(ciphertext)?;
     let mut plaintext = Vec::new();
@@ -42,6 +43,6 @@ fn parse_recipients(public_keys: &[&str]) -> Result<Vec<SshRecipient>, ParseReci
         .collect()
 }
 
-fn parse_identity(private_key: &str) -> Result<SshIdentity, std::io::Error> {
-    SshIdentity::from_buffer(private_key.as_bytes(), None)
+fn parse_identity(private_key: &str, private_key_filename: Option<&str>) -> Result<SshIdentity, std::io::Error> {
+    SshIdentity::from_buffer(private_key.as_bytes(), private_key_filename.map(|f| f.to_string()))
 }
