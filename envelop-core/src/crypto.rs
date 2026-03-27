@@ -25,7 +25,8 @@ pub fn decrypt(
     private_key: &str,
     private_key_filename: Option<&str>,
 ) -> Result<Vec<u8>, Box<dyn std::error::Error>> {
-    let identity = parse_identity(private_key, private_key_filename).map_err(|_e| "TODO: Custom error")?;
+    let identity =
+        parse_identity(private_key, private_key_filename).map_err(|_e| "TODO: Custom error")?;
 
     let decryptor = Decryptor::new(ciphertext)?;
     let mut plaintext = Vec::new();
@@ -43,8 +44,14 @@ fn parse_recipients(public_keys: &[&str]) -> Result<Vec<SshRecipient>, ParseReci
         .collect()
 }
 
-fn parse_identity(private_key: &str, private_key_filename: Option<&str>) -> Result<SshIdentity, std::io::Error> {
-    SshIdentity::from_buffer(private_key.as_bytes(), private_key_filename.map(|f| f.to_string()))
+fn parse_identity(
+    private_key: &str,
+    private_key_filename: Option<&str>,
+) -> Result<SshIdentity, std::io::Error> {
+    SshIdentity::from_buffer(
+        private_key.as_bytes(),
+        private_key_filename.map(|f| f.to_string()),
+    )
 }
 
 #[cfg(test)]
@@ -60,11 +67,17 @@ mod tests {
 
     #[test]
     fn test_ed25519_roundtrip() {
-        roundtrip(include_str!("testdata/test_id_ed25519.pub"), include_str!("testdata/test_id_ed25519"));
+        roundtrip(
+            include_str!("testdata/test_id_ed25519.pub"),
+            include_str!("testdata/test_id_ed25519"),
+        );
     }
 
     #[test]
     fn test_rsa_roundtrip() {
-        roundtrip(include_str!("testdata/test_rsa.pub"), include_str!("testdata/test_rsa"));
+        roundtrip(
+            include_str!("testdata/test_rsa.pub"),
+            include_str!("testdata/test_rsa"),
+        );
     }
 }
