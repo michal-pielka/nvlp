@@ -1,6 +1,3 @@
-[package]
-name = "envelop"
-version = "0.1.0"
-edition = "2024"
-
-[dependencies]
+[workspace]
+members = ["envelop-core", "envelop-cli"]
+resolver = "3"
