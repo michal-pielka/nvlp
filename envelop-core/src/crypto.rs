@@ -1,5 +1,7 @@
 use std::io::{Read, Write};
 
+use age::armor::Format::AsciiArmor;
+use age::armor::{ArmoredReader, ArmoredWriter};
 use age::ssh::{Identity as SshIdentity, ParseRecipientKeyError, Recipient as SshRecipient};
 use age::{Decryptor, Encryptor, Identity, Recipient};
 
@@ -13,9 +15,11 @@ pub fn encrypt(
     let encryptor = Encryptor::with_recipients(recipients)?;
     let mut ciphertext = Vec::new();
 
-    let mut writer = encryptor.wrap_output(&mut ciphertext)?;
+    let armored = ArmoredWriter::wrap_output(&mut ciphertext, AsciiArmor)?;
+    let mut writer = encryptor.wrap_output(armored)?;
     writer.write_all(plaintext)?;
-    writer.finish()?;
+    let armored = writer.finish()?;
+    armored.finish()?;
 
     Ok(ciphertext)
 }
@@ -28,7 +32,8 @@ pub fn decrypt(
     let identity =
         parse_identity(private_key, private_key_filename).map_err(|_e| "TODO: Custom error")?;
 
-    let decryptor = Decryptor::new(ciphertext)?;
+    let armored = ArmoredReader::new(ciphertext);
+    let decryptor = Decryptor::new(armored)?;
     let mut plaintext = Vec::new();
 
     let mut reader = decryptor.decrypt(std::iter::once(&identity as &dyn Identity))?;
