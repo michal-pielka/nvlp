@@ -1,7 +1,7 @@
-use std::io::Write;
+use std::io::{Read, Write};
 
-use age::ssh::{ParseRecipientKeyError, Recipient as SshRecipient};
-use age::{Encryptor, Recipient};
+use age::ssh::{Identity as SshIdentity, ParseRecipientKeyError, Recipient as SshRecipient};
+use age::{Decryptor, Encryptor, Identity, Recipient};
 
 pub fn encrypt(
     plaintext: &[u8],
@@ -24,7 +24,15 @@ pub fn decrypt(
     ciphertext: &[u8],
     private_key: &str,
 ) -> Result<Vec<u8>, Box<dyn std::error::Error>> {
-    Ok(vec![])
+    let identity = parse_identity(private_key).map_err(|_e| "TODO: Custom error")?;
+
+    let decryptor = Decryptor::new(ciphertext)?;
+    let mut plaintext = Vec::new();
+
+    let mut reader = decryptor.decrypt(std::iter::once(&identity as &dyn Identity))?;
+    reader.read_to_end(&mut plaintext)?;
+
+    Ok(plaintext)
 }
 
 fn parse_recipients(public_keys: &[&str]) -> Result<Vec<SshRecipient>, ParseRecipientKeyError> {
