@@ -46,3 +46,20 @@ fn parse_recipients(public_keys: &[&str]) -> Result<Vec<SshRecipient>, ParseReci
 fn parse_identity(private_key: &str, private_key_filename: Option<&str>) -> Result<SshIdentity, std::io::Error> {
     SshIdentity::from_buffer(private_key.as_bytes(), private_key_filename.map(|f| f.to_string()))
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_encrypt_decrypt_ed25519_roundtrip() {
+        let plaintext = "plaintext soon to be encrypted:)";
+        let ed25519_private_key = include_str!("testdata/test_id_ed25519");
+        let ed25519_public_key = include_str!("testdata/test_id_ed25519.pub");
+
+        let encrypted = encrypt(plaintext.as_bytes(), &[ed25519_public_key]).unwrap();
+        let decrypted = decrypt(&encrypted, ed25519_private_key, None).unwrap();
+
+        assert_eq!(plaintext.as_bytes(), &decrypted);
+    }
+}
