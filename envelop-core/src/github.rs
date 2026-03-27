@@ -52,3 +52,24 @@ pub fn create_gist(
 
     Ok(resp.json()?)
 }
+
+// TODO: error handling
+pub fn resolve_token(explicit_token: Option<&str>) -> Result<String, Box<dyn std::error::Error>> {
+    // Prioritize --token flag
+    if let Some(token) = explicit_token {
+        return Ok(token.to_string());
+    }
+
+    // If --token not provided, check GITHUB_TOKEN env variable
+    if let Ok(token) = std::env::var("GITHUB_TOKEN") {
+        return Ok(token);
+    }
+
+    // If neither --token nor GITHUB_TOKEN provided, fallback to github cli: "gh auth token"
+    let output = std::process::Command::new("gh")
+        .args(["auth", "token"])
+        .output()?;
+    let stdout = output.stdout;
+
+    Ok(String::from_utf8(stdout)?)
+}
