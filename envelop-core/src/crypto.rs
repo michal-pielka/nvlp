@@ -51,27 +51,20 @@ fn parse_identity(private_key: &str, private_key_filename: Option<&str>) -> Resu
 mod tests {
     use super::*;
 
-    #[test]
-    fn test_encrypt_decrypt_ed25519_roundtrip() {
-        let plaintext = "plaintext soon to be encrypted with ed25519 key";
-        let ed25519_private_key = include_str!("testdata/test_id_ed25519");
-        let ed25519_public_key = include_str!("testdata/test_id_ed25519.pub");
-
-        let encrypted = encrypt(plaintext.as_bytes(), &[ed25519_public_key]).unwrap();
-        let decrypted = decrypt(&encrypted, ed25519_private_key, None).unwrap();
-
-        assert_eq!(plaintext.as_bytes(), &decrypted);
+    fn roundtrip(public_key: &str, private_key: &str) {
+        let plaintext = b"test plaintext for roundtrip";
+        let encrypted = encrypt(plaintext, &[public_key]).unwrap();
+        let decrypted = decrypt(&encrypted, private_key, None).unwrap();
+        assert_eq!(plaintext.as_ref(), &decrypted);
     }
 
     #[test]
-    fn test_encrypt_decrypt_rsa_roundtrip() {
-        let plaintext = "plaintext soon to be encrypted with rsa key";
-        let rsa_private_key = include_str!("testdata/test_rsa");
-        let rsa_public_key = include_str!("testdata/test_rsa.pub");
+    fn test_ed25519_roundtrip() {
+        roundtrip(include_str!("testdata/test_id_ed25519.pub"), include_str!("testdata/test_id_ed25519"));
+    }
 
-        let encrypted = encrypt(plaintext.as_bytes(), &[rsa_public_key]).unwrap();
-        let decrypted = decrypt(&encrypted, rsa_private_key, None).unwrap();
-
-        assert_eq!(plaintext.as_bytes(), &decrypted);
+    #[test]
+    fn test_rsa_roundtrip() {
+        roundtrip(include_str!("testdata/test_rsa.pub"), include_str!("testdata/test_rsa"));
     }
 }
