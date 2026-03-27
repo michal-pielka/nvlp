@@ -20,7 +20,7 @@ pub fn fetch_public_keys(username: &str) -> Result<Vec<String>, Box<dyn std::err
     Ok(public_keys)
 }
 
-#[derive(Deserialize)]
+#[derive(Debug, Deserialize)]
 pub struct Gist {
     pub id: String,
     pub html_url: String,
