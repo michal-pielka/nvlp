@@ -1,4 +1,7 @@
+use serde::Deserialize;
+
 const BASE_URL: &str = "https://github.com";
+const API_URL: &str = "https://api.github.com";
 
 // TODO: error handling
 pub fn fetch_public_keys(username: &str) -> Result<Vec<String>, Box<dyn std::error::Error>> {
@@ -13,4 +16,10 @@ pub fn fetch_public_keys(username: &str) -> Result<Vec<String>, Box<dyn std::err
         .collect();
 
     Ok(public_keys)
+}
+
+#[derive(Deserialize)]
+pub struct Gist {
+    id: String,
+    html_url: String,
 }
