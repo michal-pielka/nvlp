@@ -2,6 +2,3 @@
 name = "envelop-core"
 version = "0.1.0"
 edition = "2024"
-
-[dependencies]
-ssh-key = "0.6.7"
