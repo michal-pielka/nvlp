@@ -1,4 +1,4 @@
-use std::path::PathBuf;
+use std::path::{Path, PathBuf};
 
 use clap::Parser;
 use envelop_cli::cli::{Args, Command};
@@ -27,7 +27,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
             url,
             identity_path,
             output_path,
-        } => handle_open_command(&url, identity_path.as_ref(), &output_path),
+        } => handle_open_command(&url, identity_path.as_deref(), &output_path),
 
         Command::Keys { username } => handle_keys_command(&username),
     }
@@ -70,8 +70,8 @@ fn handle_send_command(
 
 fn handle_open_command(
     url: &str,
-    identity_path: Option<&PathBuf>,
-    output_path: &PathBuf,
+    identity_path: Option<&Path>,
+    output_path: &Path,
 ) -> Result<(), Box<dyn std::error::Error>> {
     // Parse url
     let parts: Vec<&str> = url.trim_end_matches('/').rsplit('/').collect();
@@ -83,7 +83,7 @@ fn handle_open_command(
 
     // Read private key
     let identity_path = match identity_path {
-        Some(p) => p.clone(),
+        Some(p) => p.to_path_buf(),
         None => dirs::home_dir()
             .ok_or("TODO: Error")?
             .join(".ssh/id_ed25519"),
