@@ -108,6 +108,11 @@ pub fn resolve_token(explicit_token: Option<&str>) -> Result<String, Box<dyn std
     let output = std::process::Command::new("gh")
         .args(["auth", "token"])
         .output()?;
+
+    if !output.status.success() {
+        return Err("TODO: No gh cli app".into());
+    }
+
     let stdout = output.stdout;
 
     Ok(String::from_utf8(stdout)?.trim().to_string())
