@@ -1,6 +1,6 @@
 use std::path::Path;
 
-use envelop_core::github;
+use nvlp_core::github;
 
 use super::decrypt_and_unpack;
 

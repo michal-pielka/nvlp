@@ -37,19 +37,19 @@ pub fn create_gist(
 
     let description = match description {
         Some(c) => c.to_string(),
-        None => format!("Envelop for {recipient}"),
+        None => format!("nvlp for {recipient}"),
     };
 
     let client = Client::new();
     let body = json!({
         "description": description,
         "public": false,
-        "files": {"envelop.age": {"content": content}},
+        "files": {"nvlp.age": {"content": content}},
     });
     let resp = client
         .post(create_gist_url)
         .json(&body)
-        .header("User-Agent", "envelop")
+        .header("User-Agent", "nvlp")
         .header("Accept", "application/vnd.github+json")
         .header("Authorization", format!("Bearer {token}"))
         .header("X-GitHub-Api-Version", "2026-03-10")
@@ -70,7 +70,7 @@ pub fn comment_on_gist(
     let comment = match comment {
         Some(c) => c.to_string(),
         None => format!(
-            "@{recipient} you have a new envelop!\n```bash\nenvelop open {}\n```",
+            "@{recipient} you have a new nvlp!\n```bash\nnvlp open {}\n```",
             gist.html_url
         ),
     };
@@ -82,7 +82,7 @@ pub fn comment_on_gist(
     let _resp = client
         .post(comment_gist_url)
         .json(&body)
-        .header("User-Agent", "envelop")
+        .header("User-Agent", "nvlp")
         .header("Accept", "application/vnd.github+json")
         .header("Authorization", format!("Bearer {token}"))
         .header("X-GitHub-Api-Version", "2026-03-10")
@@ -94,7 +94,7 @@ pub fn comment_on_gist(
 
 // TODO: use official github api + implement custom filenames later?
 pub fn download_gist_content(gist_id: &str, owner: &str) -> Result<String> {
-    let file = "envelop.age";
+    let file = "nvlp.age";
     let raw_gist_url = format!("https://gist.githubusercontent.com/{owner}/{gist_id}/raw/{file}");
 
     Ok(reqwest::blocking::get(raw_gist_url)?

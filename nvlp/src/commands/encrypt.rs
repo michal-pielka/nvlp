@@ -1,6 +1,6 @@
 use std::path::{Path, PathBuf};
 
-use envelop_core::{archive, crypto};
+use nvlp_core::{archive, crypto};
 
 use super::fetch_all_keys;
 
@@ -18,7 +18,7 @@ pub fn handle(paths: &[PathBuf], to: &[String], output: Option<&Path>) -> anyhow
             name.push(".age");
             PathBuf::from(name)
         }
-        None => PathBuf::from("envelop.age"),
+        None => PathBuf::from("nvlp.age"),
     };
 
     std::fs::write(&output_path, &ciphertext)?;

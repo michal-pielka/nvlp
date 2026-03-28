@@ -1,6 +1,6 @@
 use std::path::Path;
 
-use envelop_core::{archive, crypto, github};
+use nvlp_core::{archive, crypto, github};
 
 pub mod decrypt;
 pub mod encrypt;

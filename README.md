@@ -1,4 +1,4 @@
-# envelop
+# nvlp
 
 **Like `age`, but the keys come from GitHub.**
 
@@ -9,12 +9,12 @@ If they have SSH keys on GitHub, you can encrypt a file for them.
 
 ## How it works
 
-1. You run `envelop encrypt secret.env --to alice`
-2. Envelop fetches Alice's SSH public keys from GitHub
+1. You run `nvlp encrypt secret.env --to alice`
+2. nvlp fetches Alice's SSH public keys from GitHub
 3. Your file is encrypted using [age](https://github.com/FiloSottile/age) with those keys
 4. You get `secret.env.age` and send it however you want (Slack, email, etc.)
 
-Alice runs `envelop decrypt secret.env.age` and the file is decrypted with her local SSH private key.
+Alice runs `nvlp decrypt secret.env.age` and the file is decrypted with her local SSH private key.
 
 That's it. No PGP, no key servers, no pre-shared secrets.
 
@@ -23,14 +23,13 @@ That's it. No PGP, no key servers, no pre-shared secrets.
 ### From source
 
 ```bash
-cargo install --path envelop-cli
+cargo install --path nvlp
 ```
 
 ### From crates.io
 
 ```bash
-# coming soon
-cargo install envelop-cli
+cargo install nvlp
 ```
 
 ## Quick start
@@ -38,62 +37,62 @@ cargo install envelop-cli
 ### Encrypt a file
 
 ```bash
-envelop encrypt secret.env --to alice
+nvlp encrypt secret.env --to alice
 # -> secret.env.age
 ```
 
 Encrypt for multiple recipients:
 
 ```bash
-envelop encrypt secret.env --to alice --to bob
+nvlp encrypt secret.env --to alice --to bob
 ```
 
 Encrypt multiple files (they get bundled into a tar archive):
 
 ```bash
-envelop encrypt report.pdf notes.txt --to alice
-# -> envelop.age
+nvlp encrypt report.pdf notes.txt --to alice
+# -> nvlp.age
 ```
 
 Specify a custom output path:
 
 ```bash
-envelop encrypt secret.env --to alice -o secrets.age
+nvlp encrypt secret.env --to alice -o secrets.age
 ```
 
 ### Decrypt a file
 
 ```bash
-envelop decrypt secret.env.age
+nvlp decrypt secret.env.age
 ```
 
 Specify a different SSH key or output directory:
 
 ```bash
-envelop decrypt secret.env.age \
+nvlp decrypt secret.env.age \
   --identity ~/.ssh/id_rsa \
   --output ~/downloads
 ```
 
 ### Send via GitHub Gist
 
-If you want envelop to handle delivery too, use `send`. It encrypts the file, uploads it
+If you want nvlp to handle delivery too, use `send`. It encrypts the file, uploads it
 as a private Gist, and notifies the recipient with a comment.
 
 ```bash
-envelop send secret.env --to alice
+nvlp send secret.env --to alice
 ```
 
 Send to multiple recipients:
 
 ```bash
-envelop send secret.env --to alice --to bob
+nvlp send secret.env --to alice --to bob
 ```
 
 Add a custom description and comment:
 
 ```bash
-envelop send secret.env --to alice \
+nvlp send secret.env --to alice \
   --description "Q4 financials" \
   --comment "Hey Alice, here are the numbers you asked for"
 ```
@@ -101,13 +100,13 @@ envelop send secret.env --to alice \
 ### Open a Gist
 
 ```bash
-envelop open https://gist.github.com/bob/abc123def456
+nvlp open https://gist.github.com/bob/abc123def456
 ```
 
 Specify a different SSH key or output directory:
 
 ```bash
-envelop open https://gist.github.com/bob/abc123def456 \
+nvlp open https://gist.github.com/bob/abc123def456 \
   --identity ~/.ssh/id_rsa \
   --output ~/downloads
 ```
@@ -115,7 +114,7 @@ envelop open https://gist.github.com/bob/abc123def456 \
 ### Look up someone's keys
 
 ```bash
-envelop keys alice
+nvlp keys alice
 ```
 
 ## Authentication
@@ -123,7 +122,7 @@ envelop keys alice
 The `encrypt`, `decrypt`, and `keys` commands need no authentication at all.
 
 The `send` and `open` commands interact with GitHub Gists. To create Gists on your behalf,
-envelop needs a GitHub token. It checks these sources in order:
+nvlp needs a GitHub token. It checks these sources in order:
 
 1. The `--token` flag
 2. The `GITHUB_TOKEN` environment variable
@@ -134,7 +133,7 @@ Your token needs the `gist` scope. You can create one at
 
 ## How encryption works
 
-Envelop uses the [age](https://age-encryption.org/) encryption format under the hood, specifically
+nvlp uses the [age](https://age-encryption.org/) encryption format under the hood, specifically
 its SSH key support. When you encrypt a file:
 
 - All of the recipient's SSH public keys are fetched from `github.com/<user>.keys`
@@ -159,9 +158,9 @@ The sender never sees or handles private keys. GitHub acts as a public key direc
 ## Project structure
 
 ```
-envelop/
-  envelop-core/   # Library: encryption, archiving, GitHub API
-  envelop-cli/    # Binary: the `envelop` command
+nvlp/
+  nvlp-core/   # Library: encryption, archiving, GitHub API
+  nvlp/         # Binary: the `nvlp` command
 ```
 
 ## Contributing

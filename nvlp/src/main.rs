@@ -1,6 +1,6 @@
 use clap::Parser;
-use envelop_cli::cli::{Args, Command};
-use envelop_cli::commands;
+use nvlp::cli::{Args, Command};
+use nvlp::commands;
 
 fn main() -> anyhow::Result<()> {
     let args = Args::parse();

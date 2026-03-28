@@ -1,6 +1,6 @@
 use std::path::PathBuf;
 
-use envelop_core::{archive, crypto, github};
+use nvlp_core::{archive, crypto, github};
 
 use super::fetch_all_keys;
 
@@ -22,7 +22,7 @@ pub fn handle(
     let token = github::resolve_token(token)?;
 
     let recipients = to.join(", @");
-    let default_description = format!("Envelop for @{recipients}");
+    let default_description = format!("nvlp for @{recipients}");
     let description = description.unwrap_or(&default_description);
 
     let gist = github::create_gist(ciphertext, &recipients, Some(description), &token)?;

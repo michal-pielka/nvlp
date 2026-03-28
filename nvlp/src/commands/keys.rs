@@ -1,4 +1,4 @@
-use envelop_core::github;
+use nvlp_core::github;
 
 pub fn handle(username: &str) -> anyhow::Result<()> {
     let public_keys = github::fetch_public_keys(username)?;

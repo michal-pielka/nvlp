@@ -23,12 +23,12 @@ pub enum Command {
         #[arg(short, long, value_name = "USERNAME", required = true, action = clap::ArgAction::Append)]
         to: Vec<String>,
 
-        /// Output file path (defaults to <filename>.age for single files, envelop.age for multiple)
+        /// Output file path (defaults to <filename>.age for single files, nvlp.age for multiple)
         #[arg(short, long, value_name = "FILE")]
         output: Option<PathBuf>,
     },
 
-    /// Decrypt a .age file encrypted with envelop
+    /// Decrypt a .age file encrypted with nvlp
     Decrypt {
         /// Encrypted file to decrypt
         file: PathBuf,
@@ -65,7 +65,7 @@ pub enum Command {
         token: Option<String>,
     },
 
-    /// Decrypt and extract files from an envelop Gist
+    /// Decrypt and extract files from a nvlp Gist
     Open {
         /// URL of the Gist to open (e.g. https://gist.github.com/user/abc123)
         url: String,
