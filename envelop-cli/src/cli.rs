@@ -11,6 +11,7 @@ pub struct Args {
 #[derive(Subcommand)]
 pub enum Command {
     Send {
+        #[arg(required = true, num_args = 1..)]
         files: Vec<PathBuf>,
 
         #[arg(short, long, value_name = "USERNAME")]
