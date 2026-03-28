@@ -28,6 +28,8 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
             identity_path,
             output_path,
         } => handle_open_command(&url, identity_path.as_ref(), &output_path),
+
+        Command::Keys { username } => handle_keys_command(&username),
     }
 }
 
@@ -94,6 +96,17 @@ fn handle_open_command(
     // TODO: hardcoded path - we want to maintain single file filename
     if archive::unpack_files(&plaintext_bytes, output_path).is_err() {
         std::fs::write(output_path.join("envelop.out"), &plaintext_bytes)?;
+    }
+
+    Ok(())
+}
+
+fn handle_keys_command(username: &str) -> Result<(), Box<dyn std::error::Error>> {
+    // Fetch friend's public keys
+    let public_keys = github::fetch_public_keys(username)?;
+
+    for key in &public_keys {
+        println!("{key}");
     }
 
     Ok(())

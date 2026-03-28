@@ -36,4 +36,8 @@ pub enum Command {
         #[arg(short, long, default_value = ".")]
         output_path: PathBuf,
     },
+
+    Keys {
+        username: String,
+    },
 }
