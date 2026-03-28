@@ -44,11 +44,8 @@ fn handle_send_command(
     let public_keys = github::fetch_public_keys(to)?;
     let public_keys: Vec<&str> = public_keys.iter().map(|k| k.as_str()).collect();
 
-    // Pack file(s)
-    let payload = match paths.len() {
-        1 => std::fs::read(&paths[0])?,
-        _ => archive::pack_files(paths)?,
-    };
+    // Pack file(s) into tar archive
+    let payload = archive::pack_files(paths)?;
 
     // Encrypt to those public keys
     let ciphertext_bytes = crypto::encrypt(&payload, &public_keys)?;
@@ -93,10 +90,8 @@ fn handle_open_command(
     // Decrypt
     let plaintext_bytes = crypto::decrypt(ciphertext.as_bytes(), &private_key, None)?;
 
-    // TODO: hardcoded path - we want to maintain single file filename
-    if archive::unpack_files(&plaintext_bytes, output_path).is_err() {
-        std::fs::write(output_path.join("envelop.out"), &plaintext_bytes)?;
-    }
+    // Unpack tar archive
+    archive::unpack_files(&plaintext_bytes, output_path)?;
 
     Ok(())
 }
