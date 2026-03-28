@@ -160,7 +160,7 @@ The sender never sees or handles private keys. GitHub acts as a public key direc
 ```
 nvlp/
   nvlp-core/   # Library: encryption, archiving, GitHub API
-  nvlp/         # Binary: the `nvlp` command
+  nvlp/        # Binary: the 'nvlp' command
 ```
 
 ## Contributing
