@@ -1,9 +1,11 @@
 use std::path::{Path, PathBuf};
 
-use envelop_core::{archive, crypto, github};
+use envelop_core::{archive, crypto};
 
-pub fn handle(paths: &[PathBuf], to: &str, output: Option<&Path>) -> anyhow::Result<()> {
-    let public_keys = github::fetch_public_keys(to)?;
+use super::fetch_all_keys;
+
+pub fn handle(paths: &[PathBuf], to: &[String], output: Option<&Path>) -> anyhow::Result<()> {
+    let public_keys = fetch_all_keys(to)?;
     let public_keys: Vec<&str> = public_keys.iter().map(|k| k.as_str()).collect();
 
     let payload = archive::pack_files(paths)?;

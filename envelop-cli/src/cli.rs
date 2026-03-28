@@ -13,15 +13,44 @@ pub struct Args {
 
 #[derive(Subcommand)]
 pub enum Command {
+    /// Encrypt files to a GitHub user's SSH keys (no token needed)
+    Encrypt {
+        /// Files to encrypt
+        #[arg(required = true, num_args = 1..)]
+        files: Vec<PathBuf>,
+
+        /// GitHub username(s) of the recipient(s)
+        #[arg(short, long, value_name = "USERNAME", required = true, action = clap::ArgAction::Append)]
+        to: Vec<String>,
+
+        /// Output file path (defaults to <filename>.age for single files, envelop.age for multiple)
+        #[arg(short, long, value_name = "FILE")]
+        output: Option<PathBuf>,
+    },
+
+    /// Decrypt a .age file encrypted with envelop
+    Decrypt {
+        /// Encrypted file to decrypt
+        file: PathBuf,
+
+        /// Path to SSH private key for decryption
+        #[arg(short, long, value_name = "FILE")]
+        identity: Option<PathBuf>,
+
+        /// Directory to extract files into
+        #[arg(short, long, value_name = "DIR", default_value = ".")]
+        output: PathBuf,
+    },
+
     /// Encrypt and send files to a GitHub user as a private Gist
     Send {
         /// Files to encrypt and send
         #[arg(required = true, num_args = 1..)]
         files: Vec<PathBuf>,
 
-        /// GitHub username of the recipient
-        #[arg(short, long, value_name = "USERNAME")]
-        to: String,
+        /// GitHub username(s) of the recipient(s)
+        #[arg(short, long, value_name = "USERNAME", required = true, action = clap::ArgAction::Append)]
+        to: Vec<String>,
 
         /// Custom Gist description
         #[arg(short, long, value_name = "TEXT")]
@@ -40,35 +69,6 @@ pub enum Command {
     Open {
         /// URL of the Gist to open (e.g. https://gist.github.com/user/abc123)
         url: String,
-
-        /// Path to SSH private key for decryption
-        #[arg(short, long, value_name = "FILE")]
-        identity: Option<PathBuf>,
-
-        /// Directory to extract files into
-        #[arg(short, long, value_name = "DIR", default_value = ".")]
-        output: PathBuf,
-    },
-
-    /// Encrypt files to a GitHub user's SSH keys (no token needed)
-    Encrypt {
-        /// Files to encrypt
-        #[arg(required = true, num_args = 1..)]
-        files: Vec<PathBuf>,
-
-        /// GitHub username of the recipient
-        #[arg(short, long, value_name = "USERNAME")]
-        to: String,
-
-        /// Output file path (defaults to <filename>.age for single files, envelop.age for multiple)
-        #[arg(short, long, value_name = "FILE")]
-        output: Option<PathBuf>,
-    },
-
-    /// Decrypt a .age file encrypted with envelop
-    Decrypt {
-        /// Encrypted file to decrypt
-        file: PathBuf,
 
         /// Path to SSH private key for decryption
         #[arg(short, long, value_name = "FILE")]

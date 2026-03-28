@@ -1,12 +1,29 @@
 use std::path::Path;
 
-use envelop_core::{archive, crypto};
+use envelop_core::{archive, crypto, github};
 
 pub mod decrypt;
 pub mod encrypt;
 pub mod keys;
 pub mod open;
 pub mod send;
+
+fn fetch_all_keys(recipients: &[String]) -> anyhow::Result<Vec<String>> {
+    anyhow::ensure!(
+        !recipients.is_empty(),
+        "at least one --to recipient is required"
+    );
+    let mut all_keys = Vec::new();
+    for username in recipients {
+        let keys = github::fetch_public_keys(username)?;
+        anyhow::ensure!(
+            !keys.is_empty(),
+            "user @{username} has no SSH keys on GitHub"
+        );
+        all_keys.extend(keys);
+    }
+    Ok(all_keys)
+}
 
 fn decrypt_and_unpack(
     ciphertext: &[u8],

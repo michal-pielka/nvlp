@@ -27,7 +27,7 @@ fn main() -> anyhow::Result<()> {
         } => commands::open::handle(&url, identity.as_deref(), &output),
 
         Command::Encrypt { files, to, output } => {
-            commands::encrypt::handle(&files, &to, output.as_deref())
+            commands::encrypt::handle(&files, &to[..], output.as_deref())
         }
 
         Command::Decrypt {
