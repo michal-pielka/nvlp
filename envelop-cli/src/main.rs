@@ -25,9 +25,9 @@ fn main() -> anyhow::Result<()> {
 
         Command::Open {
             url,
-            identity_path,
-            output_path,
-        } => handle_open_command(&url, identity_path.as_deref(), &output_path),
+            identity,
+            output,
+        } => handle_open_command(&url, identity.as_deref(), &output),
 
         Command::Keys { username } => handle_keys_command(&username),
     }
