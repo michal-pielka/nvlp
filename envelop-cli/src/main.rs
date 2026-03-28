@@ -27,7 +27,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
             url,
             identity_path,
             output_path,
-        } => handle_open_command(&url, &identity_path, &output_path),
+        } => handle_open_command(&url, identity_path.as_ref(), &output_path),
     }
 }
 
@@ -68,7 +68,7 @@ fn handle_send_command(
 
 fn handle_open_command(
     url: &str,
-    identity_path: &PathBuf,
+    identity_path: Option<&PathBuf>,
     output_path: &PathBuf,
 ) -> Result<(), Box<dyn std::error::Error>> {
     // Parse url
@@ -80,6 +80,12 @@ fn handle_open_command(
     let ciphertext = github::download_gist_content(gist_id, owner)?;
 
     // Read private key
+    let identity_path = match identity_path {
+        Some(p) => p.clone(),
+        None => dirs::home_dir()
+            .ok_or("TODO: Error")?
+            .join(".ssh/id_ed25519"),
+    };
     let private_key = std::fs::read_to_string(identity_path)?;
 
     // Decrypt
