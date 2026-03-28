@@ -22,6 +22,12 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
             comment.as_deref(),
             token.as_deref(),
         ),
+
+        Command::Open {
+            url,
+            identity,
+            output,
+        } => handle_open_command(),
     }
 }
 
@@ -57,5 +63,9 @@ fn handle_send_command(
 
     println!("Secret sent to @{to}\n{}", gist.html_url);
 
+    Ok(())
+}
+
+fn handle_open_command() -> Result<(), Box<dyn std::error::Error>> {
     Ok(())
 }

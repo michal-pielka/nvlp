@@ -26,4 +26,14 @@ pub enum Command {
         #[arg(long, value_name = "TOKEN")]
         token: Option<String>,
     },
+
+    Open {
+        url: String,
+
+        #[arg(short, long, default_value = "~/.ssh/id_ed25519")]
+        identity: PathBuf,
+
+        #[arg(short, long, default_value = ".")]
+        output: PathBuf,
+    },
 }
