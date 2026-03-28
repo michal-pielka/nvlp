@@ -53,6 +53,39 @@ pub fn create_gist(
     Ok(resp.json()?)
 }
 
+pub fn comment_on_gist(
+    gist: &Gist,
+    recipient: &str,
+    comment: Option<&str>,
+    token: &str,
+) -> Result<(), Box<dyn std::error::Error>> {
+    let create_gist_url = format!("{API_URL}/gists/{}/comments", gist.id);
+
+    let comment = match comment {
+        Some(c) => c.to_string(),
+        None => format!(
+            "@{recipient} you have a new envelop!\n```\nenvelop open {}\n```",
+            gist.html_url
+        ),
+    };
+
+    let client = Client::new();
+    let body = json!({
+        "body": comment,
+    });
+    let resp = client
+        .post(create_gist_url)
+        .json(&body)
+        .header("User-Agent", "envelop")
+        .header("Accept", "application/vnd.github+json")
+        .header("Authorization", format!("Bearer {token}"))
+        .header("X-GitHub-Api-Version", "2026-03-10")
+        .send()?
+        .error_for_status()?;
+
+    Ok(resp.json()?)
+}
+
 // TODO: error handling
 pub fn resolve_token(explicit_token: Option<&str>) -> Result<String, Box<dyn std::error::Error>> {
     // Prioritize --token flag

@@ -34,6 +34,10 @@ fn handle_send_command(
 
     // Create the gist
     let gist = github::create_gist(ciphertext, to, &token)?;
+
+    // Comment on the gist
+    github::comment_on_gist(&gist, to, None, &token)?;
+
     println!("Secret sent to @{to}: {}", gist.html_url);
 
     Ok(())
