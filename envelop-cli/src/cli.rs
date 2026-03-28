@@ -50,6 +50,21 @@ pub enum Command {
         output: PathBuf,
     },
 
+    /// Encrypt files to a GitHub user's SSH keys (no token needed)
+    Encrypt {
+        /// Files to encrypt
+        #[arg(required = true, num_args = 1..)]
+        files: Vec<PathBuf>,
+
+        /// GitHub username of the recipient
+        #[arg(short, long, value_name = "USERNAME")]
+        to: String,
+
+        /// Output file path (defaults to <filename>.age for single files, envelop.age for multiple)
+        #[arg(short, long, value_name = "FILE")]
+        output: Option<PathBuf>,
+    },
+
     /// List a GitHub user's SSH public keys
     Keys {
         /// GitHub username to look up

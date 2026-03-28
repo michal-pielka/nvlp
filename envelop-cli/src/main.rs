@@ -29,6 +29,10 @@ fn main() -> anyhow::Result<()> {
             output,
         } => handle_open_command(&url, identity.as_deref(), &output),
 
+        Command::Encrypt { files, to, output } => {
+            handle_encrypt_command(&files, &to, output.as_deref())
+        }
+
         Command::Keys { username } => handle_keys_command(&username),
     }
 }
@@ -61,6 +65,33 @@ fn handle_send_command(
     github::comment_on_gist(&gist, to, comment, &token)?;
 
     println!("Secret sent to @{to}\n{}", gist.html_url);
+
+    Ok(())
+}
+
+fn handle_encrypt_command(
+    paths: &[PathBuf],
+    to: &str,
+    output: Option<&Path>,
+) -> anyhow::Result<()> {
+    let public_keys = github::fetch_public_keys(to)?;
+    let public_keys: Vec<&str> = public_keys.iter().map(|k| k.as_str()).collect();
+
+    let payload = archive::pack_files(paths)?;
+    let ciphertext = crypto::encrypt(&payload, &public_keys)?;
+
+    let output_path = match output {
+        Some(p) => p.to_path_buf(),
+        None if paths.len() == 1 => {
+            let mut name = paths[0].file_name().unwrap().to_os_string();
+            name.push(".age");
+            PathBuf::from(name)
+        }
+        None => PathBuf::from("envelop.age"),
+    };
+
+    std::fs::write(&output_path, &ciphertext)?;
+    println!("Encrypted to {}", output_path.display());
 
     Ok(())
 }
