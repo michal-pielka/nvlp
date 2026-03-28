@@ -64,7 +64,7 @@ pub fn comment_on_gist(
     let comment = match comment {
         Some(c) => c.to_string(),
         None => format!(
-            "@{recipient} you have a new envelop!\n```\nenvelop open {}\n```",
+            "@{recipient} you have a new envelop!\n```bash\nenvelop open {}\n```",
             gist.html_url
         ),
     };
