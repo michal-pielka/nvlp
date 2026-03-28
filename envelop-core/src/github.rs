@@ -71,5 +71,5 @@ pub fn resolve_token(explicit_token: Option<&str>) -> Result<String, Box<dyn std
         .output()?;
     let stdout = output.stdout;
 
-    Ok(String::from_utf8(stdout)?)
+    Ok(String::from_utf8(stdout)?.trim().to_string())
 }
