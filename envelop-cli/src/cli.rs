@@ -65,6 +65,20 @@ pub enum Command {
         output: Option<PathBuf>,
     },
 
+    /// Decrypt a .age file encrypted with envelop
+    Decrypt {
+        /// Encrypted file to decrypt
+        file: PathBuf,
+
+        /// Path to SSH private key for decryption
+        #[arg(short, long, value_name = "FILE")]
+        identity: Option<PathBuf>,
+
+        /// Directory to extract files into
+        #[arg(short, long, value_name = "DIR", default_value = ".")]
+        output: PathBuf,
+    },
+
     /// List a GitHub user's SSH public keys
     Keys {
         /// GitHub username to look up

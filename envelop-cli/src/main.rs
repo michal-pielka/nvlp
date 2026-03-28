@@ -33,6 +33,12 @@ fn main() -> anyhow::Result<()> {
             handle_encrypt_command(&files, &to, output.as_deref())
         }
 
+        Command::Decrypt {
+            file,
+            identity,
+            output,
+        } => handle_decrypt_command(&file, identity.as_deref(), &output),
+
         Command::Keys { username } => handle_keys_command(&username),
     }
 }
@@ -96,35 +102,39 @@ fn handle_encrypt_command(
     Ok(())
 }
 
-fn handle_open_command(
-    url: &str,
-    identity_path: Option<&Path>,
-    output_path: &Path,
+fn decrypt_and_unpack(
+    ciphertext: &[u8],
+    identity: Option<&Path>,
+    output: &Path,
 ) -> anyhow::Result<()> {
-    // Parse url
-    let parts: Vec<&str> = url.trim_end_matches('/').rsplit('/').collect();
-    let gist_id = parts[0];
-    let owner = parts[1];
-
-    // Download gist content: envelop.age
-    let ciphertext = github::download_gist_content(gist_id, owner)?;
-
-    // Read private key
-    let identity_path = match identity_path {
+    let identity = match identity {
         Some(p) => p.to_path_buf(),
         None => dirs::home_dir()
             .ok_or_else(|| anyhow::anyhow!("could not find home directory"))?
             .join(".ssh/id_ed25519"),
     };
-    let private_key = std::fs::read_to_string(identity_path)?;
-
-    // Decrypt
-    let plaintext_bytes = crypto::decrypt(ciphertext.as_bytes(), &private_key, None)?;
-
-    // Unpack tar archive
-    archive::unpack_files(&plaintext_bytes, output_path)?;
-
+    let private_key = std::fs::read_to_string(identity)?;
+    let plaintext = crypto::decrypt(ciphertext, &private_key, None)?;
+    archive::unpack_files(&plaintext, output)?;
     Ok(())
+}
+
+fn handle_open_command(url: &str, identity: Option<&Path>, output: &Path) -> anyhow::Result<()> {
+    let parts: Vec<&str> = url.trim_end_matches('/').rsplit('/').collect();
+    let gist_id = parts[0];
+    let owner = parts[1];
+
+    let ciphertext = github::download_gist_content(gist_id, owner)?;
+    decrypt_and_unpack(ciphertext.as_bytes(), identity, output)
+}
+
+fn handle_decrypt_command(
+    file: &Path,
+    identity: Option<&Path>,
+    output: &Path,
+) -> anyhow::Result<()> {
+    let ciphertext = std::fs::read(file)?;
+    decrypt_and_unpack(&ciphertext, identity, output)
 }
 
 fn handle_keys_command(username: &str) -> anyhow::Result<()> {
