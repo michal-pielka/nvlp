@@ -1,6 +1,6 @@
 use std::path::PathBuf;
 
-use tar::Builder;
+use tar::{Archive, Builder};
 
 pub fn pack_files(paths: &[PathBuf]) -> Result<Vec<u8>, Box<dyn std::error::Error>> {
     let mut builder = Builder::new(Vec::new());
@@ -10,4 +10,13 @@ pub fn pack_files(paths: &[PathBuf]) -> Result<Vec<u8>, Box<dyn std::error::Erro
     }
 
     Ok(builder.into_inner()?)
+}
+
+pub fn unpack_files(
+    archive: &[u8],
+    output_dir: &PathBuf,
+) -> Result<(), Box<dyn std::error::Error>> {
+    let mut archive = Archive::new(archive);
+    archive.unpack(output_dir)?;
+    Ok(())
 }
