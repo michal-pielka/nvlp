@@ -65,7 +65,7 @@ pub fn comment_on_gist(
     comment: Option<&str>,
     token: &str,
 ) -> Result<(), Box<dyn std::error::Error>> {
-    let create_gist_url = format!("{API_URL}/gists/{}/comments", gist.id);
+    let comment_gist_url = format!("{API_URL}/gists/{}/comments", gist.id);
 
     let comment = match comment {
         Some(c) => c.to_string(),
@@ -80,7 +80,7 @@ pub fn comment_on_gist(
         "body": comment,
     });
     let _resp = client
-        .post(create_gist_url)
+        .post(comment_gist_url)
         .json(&body)
         .header("User-Agent", "envelop")
         .header("Accept", "application/vnd.github+json")
