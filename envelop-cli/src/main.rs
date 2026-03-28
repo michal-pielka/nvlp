@@ -25,9 +25,9 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
 
         Command::Open {
             url,
-            identity,
-            output,
-        } => handle_open_command(),
+            identity_path,
+            output_path,
+        } => handle_open_command(&url, &identity_path, &output_path),
     }
 }
 
@@ -66,6 +66,29 @@ fn handle_send_command(
     Ok(())
 }
 
-fn handle_open_command() -> Result<(), Box<dyn std::error::Error>> {
+fn handle_open_command(
+    url: &str,
+    identity_path: &PathBuf,
+    output_path: &PathBuf,
+) -> Result<(), Box<dyn std::error::Error>> {
+    // Parse url
+    let parts: Vec<&str> = url.trim_end_matches('/').rsplit('/').collect();
+    let gist_id = parts[0];
+    let owner = parts[1];
+
+    // Download gist content: envelop.age
+    let ciphertext = github::download_gist_content(gist_id, owner)?;
+
+    // Read private key
+    let private_key = std::fs::read_to_string(identity_path)?;
+
+    // Decrypt
+    let plaintext_bytes = crypto::decrypt(ciphertext.as_bytes(), &private_key, None)?;
+
+    // TODO: hardcoded path - we want to maintain single file filename
+    if archive::unpack_files(&plaintext_bytes, output_path).is_err() {
+        std::fs::write(output_path.join("envelop.out"), &plaintext_bytes)?;
+    }
+
     Ok(())
 }

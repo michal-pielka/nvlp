@@ -31,9 +31,9 @@ pub enum Command {
         url: String,
 
         #[arg(short, long, default_value = "~/.ssh/id_ed25519")]
-        identity: PathBuf,
+        identity_path: PathBuf,
 
         #[arg(short, long, default_value = ".")]
-        output: PathBuf,
+        output_path: PathBuf,
     },
 }
