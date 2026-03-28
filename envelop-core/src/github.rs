@@ -2,11 +2,12 @@ use reqwest::blocking::Client;
 use serde::Deserialize;
 use serde_json::json;
 
+use crate::error::{Error, Result};
+
 const BASE_URL: &str = "https://github.com";
 const API_URL: &str = "https://api.github.com";
 
-// TODO: error handling
-pub fn fetch_public_keys(username: &str) -> Result<Vec<String>, Box<dyn std::error::Error>> {
+pub fn fetch_public_keys(username: &str) -> Result<Vec<String>> {
     let public_keys_url = format!("{BASE_URL}/{username}.keys");
     let text = reqwest::blocking::get(public_keys_url)?
         .error_for_status()?
@@ -26,13 +27,12 @@ pub struct Gist {
     pub html_url: String,
 }
 
-// TODO: error handling
 pub fn create_gist(
     content: &str,
     recipient: &str,
     description: Option<&str>,
     token: &str,
-) -> Result<Gist, Box<dyn std::error::Error>> {
+) -> Result<Gist> {
     let create_gist_url = format!("{API_URL}/gists");
 
     let description = match description {
@@ -64,7 +64,7 @@ pub fn comment_on_gist(
     recipient: &str,
     comment: Option<&str>,
     token: &str,
-) -> Result<(), Box<dyn std::error::Error>> {
+) -> Result<()> {
     let comment_gist_url = format!("{API_URL}/gists/{}/comments", gist.id);
 
     let comment = match comment {
@@ -92,11 +92,8 @@ pub fn comment_on_gist(
     Ok(())
 }
 
-// TODO: error handling + use official github api + implement custom filenames later?
-pub fn download_gist_content(
-    gist_id: &str,
-    owner: &str,
-) -> Result<String, Box<dyn std::error::Error>> {
+// TODO: use official github api + implement custom filenames later?
+pub fn download_gist_content(gist_id: &str, owner: &str) -> Result<String> {
     let file = "envelop.age";
     let raw_gist_url = format!("https://gist.githubusercontent.com/{owner}/{gist_id}/raw/{file}");
 
@@ -105,8 +102,7 @@ pub fn download_gist_content(
         .text()?)
 }
 
-// TODO: error handling
-pub fn resolve_token(explicit_token: Option<&str>) -> Result<String, Box<dyn std::error::Error>> {
+pub fn resolve_token(explicit_token: Option<&str>) -> Result<String> {
     // Prioritize --token flag
     if let Some(token) = explicit_token {
         return Ok(token.to_string());
@@ -123,10 +119,11 @@ pub fn resolve_token(explicit_token: Option<&str>) -> Result<String, Box<dyn std
         .output()?;
 
     if !output.status.success() {
-        return Err("TODO: No gh cli app".into());
+        return Err(Error::NoToken);
     }
 
     let stdout = output.stdout;
 
-    Ok(String::from_utf8(stdout)?.trim().to_string())
+    let token = String::from_utf8(stdout).map_err(|_| Error::NoToken)?;
+    Ok(token.trim().to_string())
 }

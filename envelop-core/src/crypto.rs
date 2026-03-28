@@ -2,21 +2,24 @@ use std::io::{Read, Write};
 
 use age::armor::Format::AsciiArmor;
 use age::armor::{ArmoredReader, ArmoredWriter};
-use age::ssh::{Identity as SshIdentity, ParseRecipientKeyError, Recipient as SshRecipient};
+use age::ssh::{Identity as SshIdentity, Recipient as SshRecipient};
 use age::{Decryptor, Encryptor, Identity, Recipient};
 
-pub fn encrypt(
-    plaintext: &[u8],
-    public_keys: &[&str],
-) -> Result<Vec<u8>, Box<dyn std::error::Error>> {
-    let recipients = parse_recipients(public_keys).map_err(|_e| "TODO: Custom error")?;
+use crate::error::{Error, Result};
+
+pub fn encrypt(plaintext: &[u8], public_keys: &[&str]) -> Result<Vec<u8>> {
+    let recipients = parse_recipients(public_keys)?;
     let recipients = recipients.iter().map(|r| r as &dyn Recipient);
 
-    let encryptor = Encryptor::with_recipients(recipients)?;
+    let encryptor =
+        Encryptor::with_recipients(recipients).map_err(|e| Error::Encrypt(e.to_string()))?;
     let mut ciphertext = Vec::new();
 
-    let armored = ArmoredWriter::wrap_output(&mut ciphertext, AsciiArmor)?;
-    let mut writer = encryptor.wrap_output(armored)?;
+    let armored = ArmoredWriter::wrap_output(&mut ciphertext, AsciiArmor)
+        .map_err(|e| Error::Encrypt(e.to_string()))?;
+    let mut writer = encryptor
+        .wrap_output(armored)
+        .map_err(|e| Error::Encrypt(e.to_string()))?;
     writer.write_all(plaintext)?;
     let armored = writer.finish()?;
     armored.finish()?;
@@ -28,35 +31,37 @@ pub fn decrypt(
     ciphertext: &[u8],
     private_key: &str,
     private_key_filename: Option<&str>,
-) -> Result<Vec<u8>, Box<dyn std::error::Error>> {
-    let identity =
-        parse_identity(private_key, private_key_filename).map_err(|_e| "TODO: Custom error")?;
+) -> Result<Vec<u8>> {
+    let identity = parse_identity(private_key, private_key_filename)?;
 
     let armored = ArmoredReader::new(ciphertext);
-    let decryptor = Decryptor::new(armored)?;
+    let decryptor = Decryptor::new(armored).map_err(|e| Error::Decrypt(e.to_string()))?;
     let mut plaintext = Vec::new();
 
-    let mut reader = decryptor.decrypt(std::iter::once(&identity as &dyn Identity))?;
+    let mut reader = decryptor
+        .decrypt(std::iter::once(&identity as &dyn Identity))
+        .map_err(|e| Error::Decrypt(e.to_string()))?;
     reader.read_to_end(&mut plaintext)?;
 
     Ok(plaintext)
 }
 
-fn parse_recipients(public_keys: &[&str]) -> Result<Vec<SshRecipient>, ParseRecipientKeyError> {
+fn parse_recipients(public_keys: &[&str]) -> Result<Vec<SshRecipient>> {
     public_keys
         .iter()
-        .map(|&key| key.parse::<SshRecipient>())
+        .map(|&key| {
+            key.parse::<SshRecipient>()
+                .map_err(|e| Error::KeyParse(format!("{:?}", e)))
+        })
         .collect()
 }
 
-fn parse_identity(
-    private_key: &str,
-    private_key_filename: Option<&str>,
-) -> Result<SshIdentity, std::io::Error> {
+fn parse_identity(private_key: &str, private_key_filename: Option<&str>) -> Result<SshIdentity> {
     SshIdentity::from_buffer(
         private_key.as_bytes(),
         private_key_filename.map(|f| f.to_string()),
     )
+    .map_err(|e| Error::KeyParse(e.to_string()))
 }
 
 #[cfg(test)]

@@ -5,7 +5,7 @@ use envelop_cli::cli::{Args, Command};
 
 use envelop_core::{archive, crypto, github};
 
-fn main() -> Result<(), Box<dyn std::error::Error>> {
+fn main() -> anyhow::Result<()> {
     let args = Args::parse();
 
     match args.command {
@@ -39,7 +39,7 @@ fn handle_send_command(
     description: Option<&str>,
     comment: Option<&str>,
     token: Option<&str>,
-) -> Result<(), Box<dyn std::error::Error>> {
+) -> anyhow::Result<()> {
     // Fetch friend's public keys
     let public_keys = github::fetch_public_keys(to)?;
     let public_keys: Vec<&str> = public_keys.iter().map(|k| k.as_str()).collect();
@@ -72,7 +72,7 @@ fn handle_open_command(
     url: &str,
     identity_path: Option<&Path>,
     output_path: &Path,
-) -> Result<(), Box<dyn std::error::Error>> {
+) -> anyhow::Result<()> {
     // Parse url
     let parts: Vec<&str> = url.trim_end_matches('/').rsplit('/').collect();
     let gist_id = parts[0];
@@ -85,7 +85,7 @@ fn handle_open_command(
     let identity_path = match identity_path {
         Some(p) => p.to_path_buf(),
         None => dirs::home_dir()
-            .ok_or("TODO: Error")?
+            .ok_or_else(|| anyhow::anyhow!("could not find home directory"))?
             .join(".ssh/id_ed25519"),
     };
     let private_key = std::fs::read_to_string(identity_path)?;
@@ -101,7 +101,7 @@ fn handle_open_command(
     Ok(())
 }
 
-fn handle_keys_command(username: &str) -> Result<(), Box<dyn std::error::Error>> {
+fn handle_keys_command(username: &str) -> anyhow::Result<()> {
     // Fetch friend's public keys
     let public_keys = github::fetch_public_keys(username)?;
 
