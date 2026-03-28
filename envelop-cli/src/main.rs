@@ -33,7 +33,7 @@ fn handle_send_command(
     let token = github::resolve_token(token)?;
 
     // Create the gist
-    let gist = github::create_gist(ciphertext, to, &token);
+    let gist = github::create_gist(ciphertext, to, &token)?;
     println!("{:?}", gist);
 
     Ok(())
