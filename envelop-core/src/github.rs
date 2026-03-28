@@ -30,13 +30,19 @@ pub struct Gist {
 pub fn create_gist(
     content: &str,
     recipient: &str,
+    description: Option<&str>,
     token: &str,
 ) -> Result<Gist, Box<dyn std::error::Error>> {
     let create_gist_url = format!("{API_URL}/gists");
 
+    let description = match description {
+        Some(c) => c.to_string(),
+        None => format!("Envelop for {recipient}"),
+    };
+
     let client = Client::new();
     let body = json!({
-        "description": format!("Envelop for {recipient}"),
+        "description": description,
         "public": false,
         "files": {"envelop.age": {"content": content}},
     });

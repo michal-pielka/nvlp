@@ -17,6 +17,9 @@ pub enum Command {
         to: String,
 
         #[arg(short, long)]
+        description: Option<String>,
+
+        #[arg(short, long)]
         comment: Option<String>,
 
         #[arg(long, value_name = "TOKEN")]

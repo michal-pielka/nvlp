@@ -12,15 +12,23 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
         Command::Send {
             file,
             to,
-            token,
+            description,
             comment,
-        } => handle_send_command(file, &to, comment.as_deref(), token.as_deref()),
+            token,
+        } => handle_send_command(
+            file,
+            &to,
+            description.as_deref(),
+            comment.as_deref(),
+            token.as_deref(),
+        ),
     }
 }
 
 fn handle_send_command(
     file: PathBuf,
     to: &str,
+    description: Option<&str>,
     comment: Option<&str>,
     token: Option<&str>,
 ) -> Result<(), Box<dyn std::error::Error>> {
@@ -39,7 +47,7 @@ fn handle_send_command(
     let token = github::resolve_token(token)?;
 
     // Create the gist
-    let gist = github::create_gist(ciphertext, to, &token)?;
+    let gist = github::create_gist(ciphertext, to, description, &token)?;
 
     // Comment on the gist
     github::comment_on_gist(&gist, to, comment, &token)?;
