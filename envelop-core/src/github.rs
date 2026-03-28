@@ -73,7 +73,7 @@ pub fn comment_on_gist(
     let body = json!({
         "body": comment,
     });
-    let resp = client
+    let _resp = client
         .post(create_gist_url)
         .json(&body)
         .header("User-Agent", "envelop")
@@ -83,7 +83,7 @@ pub fn comment_on_gist(
         .send()?
         .error_for_status()?;
 
-    Ok(resp.json()?)
+    Ok(())
 }
 
 // TODO: error handling
