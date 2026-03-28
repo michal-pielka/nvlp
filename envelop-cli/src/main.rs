@@ -3,20 +3,20 @@ use std::path::PathBuf;
 use clap::Parser;
 use envelop_cli::cli::{Args, Command};
 
-use envelop_core::{crypto, github};
+use envelop_core::{archive, crypto, github};
 
 fn main() -> Result<(), Box<dyn std::error::Error>> {
     let args = Args::parse();
 
     match args.command {
         Command::Send {
-            file,
+            files,
             to,
             description,
             comment,
             token,
         } => handle_send_command(
-            file,
+            &files,
             &to,
             description.as_deref(),
             comment.as_deref(),
@@ -26,7 +26,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
 }
 
 fn handle_send_command(
-    file: PathBuf,
+    paths: &[PathBuf],
     to: &str,
     description: Option<&str>,
     comment: Option<&str>,
@@ -36,11 +36,14 @@ fn handle_send_command(
     let public_keys = github::fetch_public_keys(to)?;
     let public_keys: Vec<&str> = public_keys.iter().map(|k| k.as_str()).collect();
 
-    // Read the file
-    let plaintext = std::fs::read(file)?;
+    // Pack file(s)
+    let payload = match paths.len() {
+        1 => std::fs::read(&paths[0])?,
+        _ => archive::pack_files(paths)?,
+    };
 
     // Encrypt to those public keys
-    let ciphertext_bytes = crypto::encrypt(&plaintext, &public_keys)?;
+    let ciphertext_bytes = crypto::encrypt(&payload, &public_keys)?;
     let ciphertext = std::str::from_utf8(&ciphertext_bytes)?;
 
     // Resolve token
