@@ -9,13 +9,19 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     let args = Args::parse();
 
     match args.command {
-        Command::Send { file, to, token } => handle_send_command(file, &to, token.as_deref()),
+        Command::Send {
+            file,
+            to,
+            token,
+            comment,
+        } => handle_send_command(file, &to, comment.as_deref(), token.as_deref()),
     }
 }
 
 fn handle_send_command(
     file: PathBuf,
     to: &str,
+    comment: Option<&str>,
     token: Option<&str>,
 ) -> Result<(), Box<dyn std::error::Error>> {
     // Fetch friend's public keys
@@ -36,7 +42,7 @@ fn handle_send_command(
     let gist = github::create_gist(ciphertext, to, &token)?;
 
     // Comment on the gist
-    github::comment_on_gist(&gist, to, None, &token)?;
+    github::comment_on_gist(&gist, to, comment, &token)?;
 
     println!("Secret sent to @{to}\n{}", gist.html_url);
 
