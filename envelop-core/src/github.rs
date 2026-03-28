@@ -92,6 +92,19 @@ pub fn comment_on_gist(
     Ok(())
 }
 
+// TODO: error handling + use official github api + implement custom filenames later?
+pub fn download_gist_content(
+    gist_id: &str,
+    owner: &str,
+) -> Result<String, Box<dyn std::error::Error>> {
+    let file = "envelop.age";
+    let raw_gist_url = format!("https://gist.githubusercontent.com/{owner}/{gist_id}/raw/{file}");
+
+    Ok(reqwest::blocking::get(raw_gist_url)?
+        .error_for_status()?
+        .text()?)
+}
+
 // TODO: error handling
 pub fn resolve_token(explicit_token: Option<&str>) -> Result<String, Box<dyn std::error::Error>> {
     // Prioritize --token flag
