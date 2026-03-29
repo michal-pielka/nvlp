@@ -4,17 +4,25 @@ use nvlp_core::github;
 
 use super::decrypt_bytes;
 
-pub fn handle(url: &str, identity: Option<&Path>, output: Option<&Path>) -> anyhow::Result<()> {
-    let parts: Vec<&str> = url.trim_end_matches('/').rsplit('/').collect();
-    let gist_id = parts[0];
-    let owner = parts[1];
+pub fn handle(
+    url: &str,
+    identity: Option<&Path>,
+    output: Option<&Path>,
+    token: Option<&str>,
+) -> anyhow::Result<()> {
+    let gist_id = url.trim_end_matches('/').rsplit('/').next().unwrap();
 
-    let ciphertext = github::download_gist_content(gist_id, owner)?;
-    let plaintext = decrypt_bytes(ciphertext.as_bytes(), identity)?;
+    let token = github::resolve_token(token)?;
+    let gist_file = github::fetch_gist(gist_id, &token)?;
+
+    let plaintext = decrypt_bytes(gist_file.content.as_bytes(), identity)?;
 
     let output_path = match output {
         Some(p) => p.to_path_buf(),
-        None => PathBuf::from("nvlp"),
+        None => {
+            let name = gist_file.filename;
+            PathBuf::from(name.strip_suffix(".age").unwrap_or(&name).to_string())
+        }
     };
 
     std::fs::write(&output_path, &plaintext)?;

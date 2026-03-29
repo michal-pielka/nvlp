@@ -1,3 +1,5 @@
+use std::collections::HashMap;
+
 use reqwest::blocking::Client;
 use serde::Deserialize;
 use serde_json::json;
@@ -93,12 +95,32 @@ pub fn comment_on_gist(
     Ok(())
 }
 
-pub fn download_gist_content(gist_id: &str, owner: &str) -> Result<String> {
-    let raw_gist_url = format!("https://gist.githubusercontent.com/{owner}/{gist_id}/raw");
+#[derive(Debug, Deserialize)]
+pub struct GistFile {
+    pub filename: String,
+    pub content: String,
+}
 
-    Ok(reqwest::blocking::get(raw_gist_url)?
+#[derive(Debug, Deserialize)]
+struct GistResponse {
+    files: HashMap<String, GistFile>,
+}
+
+pub fn fetch_gist(gist_id: &str, token: &str) -> Result<GistFile> {
+    let url = format!("{API_URL}/gists/{gist_id}");
+
+    let client = Client::new();
+    let resp: GistResponse = client
+        .get(url)
+        .header("User-Agent", "nvlp")
+        .header("Accept", "application/vnd.github+json")
+        .header("Authorization", format!("Bearer {token}"))
+        .header("X-GitHub-Api-Version", "2026-03-10")
+        .send()?
         .error_for_status()?
-        .text()?)
+        .json()?;
+
+    resp.files.into_values().next().ok_or(Error::EmptyGist)
 }
 
 pub fn resolve_token(explicit_token: Option<&str>) -> Result<String> {

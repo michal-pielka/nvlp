@@ -72,9 +72,13 @@ pub enum Command {
         #[arg(short, long, value_name = "FILE")]
         identity: Option<PathBuf>,
 
-        /// Output file path (defaults to nvlp)
+        /// Output file path (defaults to original filename)
         #[arg(short, long, value_name = "FILE")]
         output: Option<PathBuf>,
+
+        /// GitHub personal access token (falls back to GITHUB_TOKEN or `gh auth token` output)
+        #[arg(long, value_name = "TOKEN")]
+        token: Option<String>,
     },
 
     /// List a GitHub user's SSH public keys

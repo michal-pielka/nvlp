@@ -24,7 +24,13 @@ fn main() -> anyhow::Result<()> {
             url,
             identity,
             output,
-        } => commands::open::handle(&url, identity.as_deref(), output.as_deref()),
+            token,
+        } => commands::open::handle(
+            &url,
+            identity.as_deref(),
+            output.as_deref(),
+            token.as_deref(),
+        ),
 
         Command::Encrypt { file, to, output } => {
             commands::encrypt::handle(&file, &to[..], output.as_deref())

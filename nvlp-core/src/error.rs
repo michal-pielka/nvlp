@@ -21,8 +21,8 @@ pub enum Error {
     #[error("{0}")]
     Io(#[from] std::io::Error),
 
-    #[error("archive error: {0}")]
-    Archive(String),
+    #[error("gist contains no files")]
+    EmptyGist,
 }
 
 pub type Result<T> = std::result::Result<T, Error>;
