@@ -1,5 +1,5 @@
 use std::io::{self, Read, Write};
-use std::path::{Path, PathBuf};
+use std::path::Path;
 
 use super::decrypt_bytes;
 
@@ -24,18 +24,9 @@ pub fn handle(
             std::fs::write(p, &plaintext)?;
             eprintln!("Decrypted to {}", p.display());
         }
-        None => match file {
-            Some(path) => {
-                let name = path.file_name().unwrap().to_string_lossy();
-                let output_path =
-                    PathBuf::from(name.strip_suffix(".age").unwrap_or(&name).to_string());
-                std::fs::write(&output_path, &plaintext)?;
-                eprintln!("Decrypted to {}", output_path.display());
-            }
-            None => {
-                io::stdout().write_all(&plaintext)?;
-            }
-        },
+        None => {
+            io::stdout().write_all(&plaintext)?;
+        }
     }
 
     Ok(())

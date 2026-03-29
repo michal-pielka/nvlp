@@ -22,7 +22,7 @@ pub enum Command {
         #[arg(short, long, value_name = "USERNAME", required = true, action = clap::ArgAction::Append)]
         to: Vec<String>,
 
-        /// Output file path (defaults to <filename>.age, or stdout when reading from stdin)
+        /// Output file path (defaults to stdout)
         #[arg(short, long, value_name = "FILE")]
         output: Option<PathBuf>,
     },
@@ -36,7 +36,7 @@ pub enum Command {
         #[arg(short, long, value_name = "FILE")]
         identity: Option<PathBuf>,
 
-        /// Output file path (defaults to input filename without .age, or stdout when reading from stdin)
+        /// Output file path (defaults to stdout)
         #[arg(short, long, value_name = "FILE")]
         output: Option<PathBuf>,
     },

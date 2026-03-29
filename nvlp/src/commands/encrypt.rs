@@ -1,5 +1,5 @@
 use std::io::{self, Read, Write};
-use std::path::{Path, PathBuf};
+use std::path::Path;
 
 use nvlp_core::crypto;
 
@@ -25,18 +25,9 @@ pub fn handle(file: Option<&Path>, to: &[String], output: Option<&Path>) -> anyh
             std::fs::write(p, &ciphertext)?;
             eprintln!("Encrypted to {}", p.display());
         }
-        None => match file {
-            Some(path) => {
-                let mut name = path.file_name().unwrap().to_os_string();
-                name.push(".age");
-                let output_path = PathBuf::from(name);
-                std::fs::write(&output_path, &ciphertext)?;
-                eprintln!("Encrypted to {}", output_path.display());
-            }
-            None => {
-                io::stdout().write_all(&ciphertext)?;
-            }
-        },
+        None => {
+            io::stdout().write_all(&ciphertext)?;
+        }
     }
 
     Ok(())
