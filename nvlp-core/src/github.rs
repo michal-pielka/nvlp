@@ -29,6 +29,7 @@ pub struct Gist {
 
 pub fn create_gist(
     content: &str,
+    filename: &str,
     recipient: &str,
     description: Option<&str>,
     token: &str,
@@ -44,7 +45,7 @@ pub fn create_gist(
     let body = json!({
         "description": description,
         "public": false,
-        "files": {"nvlp.age": {"content": content}},
+        "files": {filename: {"content": content}},
     });
     let resp = client
         .post(create_gist_url)
@@ -92,10 +93,8 @@ pub fn comment_on_gist(
     Ok(())
 }
 
-// TODO: use official github api + implement custom filenames later?
 pub fn download_gist_content(gist_id: &str, owner: &str) -> Result<String> {
-    let file = "nvlp.age";
-    let raw_gist_url = format!("https://gist.githubusercontent.com/{owner}/{gist_id}/raw/{file}");
+    let raw_gist_url = format!("https://gist.githubusercontent.com/{owner}/{gist_id}/raw");
 
     Ok(reqwest::blocking::get(raw_gist_url)?
         .error_for_status()?

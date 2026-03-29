@@ -21,11 +21,21 @@ pub fn handle(
 
     let token = github::resolve_token(token)?;
 
+    let mut filename = file.file_name().unwrap().to_os_string();
+    filename.push(".age");
+    let filename = filename.to_string_lossy();
+
     let recipients = to.join(", @");
     let default_description = format!("nvlp for @{recipients}");
     let description = description.unwrap_or(&default_description);
 
-    let gist = github::create_gist(ciphertext, &recipients, Some(description), &token)?;
+    let gist = github::create_gist(
+        ciphertext,
+        &filename,
+        &recipients,
+        Some(description),
+        &token,
+    )?;
 
     for recipient in to {
         github::comment_on_gist(&gist, recipient, comment, &token)?;
