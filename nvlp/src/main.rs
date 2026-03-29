@@ -35,15 +35,14 @@ fn main() -> anyhow::Result<()> {
         ),
 
         Command::Encrypt { file, to, output } => {
-            commands::encrypt::handle(&file, &to[..], output.as_deref())
+            commands::encrypt::handle(file.as_deref(), &to[..], output.as_deref())
         }
 
         Command::Decrypt {
             file,
             identity,
             output,
-            stdout,
-        } => commands::decrypt::handle(&file, identity.as_deref(), output.as_deref(), stdout),
+        } => commands::decrypt::handle(file.as_deref(), identity.as_deref(), output.as_deref()),
 
         Command::Keys { username } => commands::keys::handle(&username),
     }

@@ -13,36 +13,32 @@ pub struct Args {
 
 #[derive(Subcommand)]
 pub enum Command {
-    /// Encrypt a file to a GitHub user's SSH keys (no token needed)
+    /// Encrypt a file (or stdin) to a GitHub user's SSH keys
     Encrypt {
-        /// File to encrypt
-        file: PathBuf,
+        /// File to encrypt (reads from stdin if omitted)
+        file: Option<PathBuf>,
 
         /// GitHub username(s) of the recipient(s)
         #[arg(short, long, value_name = "USERNAME", required = true, action = clap::ArgAction::Append)]
         to: Vec<String>,
 
-        /// Output file path (defaults to <filename>.age)
+        /// Output file path (defaults to <filename>.age, or stdout when reading from stdin)
         #[arg(short, long, value_name = "FILE")]
         output: Option<PathBuf>,
     },
 
-    /// Decrypt a .age file encrypted with nvlp
+    /// Decrypt a .age file (or stdin) encrypted with nvlp
     Decrypt {
-        /// Encrypted file to decrypt
-        file: PathBuf,
+        /// Encrypted file to decrypt (reads from stdin if omitted)
+        file: Option<PathBuf>,
 
         /// Path to SSH private key for decryption
         #[arg(short, long, value_name = "FILE")]
         identity: Option<PathBuf>,
 
-        /// Output file path (defaults to input filename without .age extension)
+        /// Output file path (defaults to input filename without .age, or stdout when reading from stdin)
         #[arg(short, long, value_name = "FILE")]
         output: Option<PathBuf>,
-
-        /// Print decrypted content to stdout instead of saving to a file
-        #[arg(long)]
-        stdout: bool,
     },
 
     /// Encrypt and send a file to a GitHub user as a private Gist

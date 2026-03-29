@@ -1,32 +1,42 @@
-use std::io::Write;
+use std::io::{self, Read, Write};
 use std::path::{Path, PathBuf};
 
 use super::decrypt_bytes;
 
 pub fn handle(
-    file: &Path,
+    file: Option<&Path>,
     identity: Option<&Path>,
     output: Option<&Path>,
-    stdout: bool,
 ) -> anyhow::Result<()> {
-    let ciphertext = std::fs::read(file)?;
-    let plaintext = decrypt_bytes(&ciphertext, identity)?;
-
-    if stdout {
-        std::io::stdout().write_all(&plaintext)?;
-        return Ok(());
-    }
-
-    let output_path = match output {
-        Some(p) => p.to_path_buf(),
+    let ciphertext = match file {
+        Some(path) => std::fs::read(path)?,
         None => {
-            let name = file.file_name().unwrap().to_string_lossy();
-            PathBuf::from(name.strip_suffix(".age").unwrap_or(&name).to_string())
+            let mut buf = Vec::new();
+            io::stdin().read_to_end(&mut buf)?;
+            buf
         }
     };
 
-    std::fs::write(&output_path, &plaintext)?;
-    println!("Decrypted to {}", output_path.display());
+    let plaintext = decrypt_bytes(&ciphertext, identity)?;
+
+    match output {
+        Some(p) => {
+            std::fs::write(p, &plaintext)?;
+            eprintln!("Decrypted to {}", p.display());
+        }
+        None => match file {
+            Some(path) => {
+                let name = path.file_name().unwrap().to_string_lossy();
+                let output_path =
+                    PathBuf::from(name.strip_suffix(".age").unwrap_or(&name).to_string());
+                std::fs::write(&output_path, &plaintext)?;
+                eprintln!("Decrypted to {}", output_path.display());
+            }
+            None => {
+                io::stdout().write_all(&plaintext)?;
+            }
+        },
+    }
 
     Ok(())
 }
