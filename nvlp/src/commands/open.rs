@@ -1,3 +1,4 @@
+use std::io::Write;
 use std::path::{Path, PathBuf};
 
 use nvlp_core::github;
@@ -8,6 +9,7 @@ pub fn handle(
     url: &str,
     identity: Option<&Path>,
     output: Option<&Path>,
+    stdout: bool,
     token: Option<&str>,
 ) -> anyhow::Result<()> {
     let gist_id = url.trim_end_matches('/').rsplit('/').next().unwrap();
@@ -16,6 +18,11 @@ pub fn handle(
     let gist_file = github::fetch_gist(gist_id, &token)?;
 
     let plaintext = decrypt_bytes(gist_file.content.as_bytes(), identity)?;
+
+    if stdout {
+        std::io::stdout().write_all(&plaintext)?;
+        return Ok(());
+    }
 
     let output_path = match output {
         Some(p) => p.to_path_buf(),

@@ -24,11 +24,13 @@ fn main() -> anyhow::Result<()> {
             url,
             identity,
             output,
+            stdout,
             token,
         } => commands::open::handle(
             &url,
             identity.as_deref(),
             output.as_deref(),
+            stdout,
             token.as_deref(),
         ),
 
@@ -40,7 +42,8 @@ fn main() -> anyhow::Result<()> {
             file,
             identity,
             output,
-        } => commands::decrypt::handle(&file, identity.as_deref(), output.as_deref()),
+            stdout,
+        } => commands::decrypt::handle(&file, identity.as_deref(), output.as_deref(), stdout),
 
         Command::Keys { username } => commands::keys::handle(&username),
     }

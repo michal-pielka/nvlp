@@ -1,10 +1,21 @@
+use std::io::Write;
 use std::path::{Path, PathBuf};
 
 use super::decrypt_bytes;
 
-pub fn handle(file: &Path, identity: Option<&Path>, output: Option<&Path>) -> anyhow::Result<()> {
+pub fn handle(
+    file: &Path,
+    identity: Option<&Path>,
+    output: Option<&Path>,
+    stdout: bool,
+) -> anyhow::Result<()> {
     let ciphertext = std::fs::read(file)?;
     let plaintext = decrypt_bytes(&ciphertext, identity)?;
+
+    if stdout {
+        std::io::stdout().write_all(&plaintext)?;
+        return Ok(());
+    }
 
     let output_path = match output {
         Some(p) => p.to_path_buf(),

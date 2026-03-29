@@ -39,6 +39,10 @@ pub enum Command {
         /// Output file path (defaults to input filename without .age extension)
         #[arg(short, long, value_name = "FILE")]
         output: Option<PathBuf>,
+
+        /// Print decrypted content to stdout instead of saving to a file
+        #[arg(long)]
+        stdout: bool,
     },
 
     /// Encrypt and send a file to a GitHub user as a private Gist
@@ -75,6 +79,10 @@ pub enum Command {
         /// Output file path (defaults to original filename)
         #[arg(short, long, value_name = "FILE")]
         output: Option<PathBuf>,
+
+        /// Print decrypted content to stdout instead of saving to a file
+        #[arg(long)]
+        stdout: bool,
 
         /// GitHub personal access token (falls back to GITHUB_TOKEN or `gh auth token` output)
         #[arg(long, value_name = "TOKEN")]
