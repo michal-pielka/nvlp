@@ -1,6 +1,6 @@
 use std::path::Path;
 
-use nvlp_core::{archive, crypto, github};
+use nvlp_core::{crypto, github};
 
 pub mod decrypt;
 pub mod encrypt;
@@ -25,11 +25,7 @@ fn fetch_all_keys(recipients: &[String]) -> anyhow::Result<Vec<String>> {
     Ok(all_keys)
 }
 
-fn decrypt_and_unpack(
-    ciphertext: &[u8],
-    identity: Option<&Path>,
-    output: &Path,
-) -> anyhow::Result<()> {
+fn decrypt_bytes(ciphertext: &[u8], identity: Option<&Path>) -> anyhow::Result<Vec<u8>> {
     let identity = match identity {
         Some(p) => p.to_path_buf(),
         None => dirs::home_dir()
@@ -37,7 +33,5 @@ fn decrypt_and_unpack(
             .join(".ssh/id_ed25519"),
     };
     let private_key = std::fs::read_to_string(identity)?;
-    let plaintext = crypto::decrypt(ciphertext, &private_key, None)?;
-    archive::unpack_files(&plaintext, output)?;
-    Ok(())
+    Ok(crypto::decrypt(ciphertext, &private_key, None)?)
 }

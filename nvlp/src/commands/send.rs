@@ -1,11 +1,11 @@
-use std::path::PathBuf;
+use std::path::Path;
 
-use nvlp_core::{archive, crypto, github};
+use nvlp_core::{crypto, github};
 
 use super::fetch_all_keys;
 
 pub fn handle(
-    paths: &[PathBuf],
+    file: &Path,
     to: &[String],
     description: Option<&str>,
     comment: Option<&str>,
@@ -14,7 +14,7 @@ pub fn handle(
     let public_keys = fetch_all_keys(to)?;
     let public_keys: Vec<&str> = public_keys.iter().map(|k| k.as_str()).collect();
 
-    let payload = archive::pack_files(paths)?;
+    let payload = std::fs::read(file)?;
 
     let ciphertext_bytes = crypto::encrypt(&payload, &public_keys)?;
     let ciphertext = std::str::from_utf8(&ciphertext_bytes)?;

@@ -13,17 +13,16 @@ pub struct Args {
 
 #[derive(Subcommand)]
 pub enum Command {
-    /// Encrypt files to a GitHub user's SSH keys (no token needed)
+    /// Encrypt a file to a GitHub user's SSH keys (no token needed)
     Encrypt {
-        /// Files to encrypt
-        #[arg(required = true, num_args = 1..)]
-        files: Vec<PathBuf>,
+        /// File to encrypt
+        file: PathBuf,
 
         /// GitHub username(s) of the recipient(s)
         #[arg(short, long, value_name = "USERNAME", required = true, action = clap::ArgAction::Append)]
         to: Vec<String>,
 
-        /// Output file path (defaults to <filename>.age for single files, nvlp.age for multiple)
+        /// Output file path (defaults to <filename>.age)
         #[arg(short, long, value_name = "FILE")]
         output: Option<PathBuf>,
     },
@@ -37,16 +36,15 @@ pub enum Command {
         #[arg(short, long, value_name = "FILE")]
         identity: Option<PathBuf>,
 
-        /// Directory to extract files into
-        #[arg(short, long, value_name = "DIR", default_value = ".")]
-        output: PathBuf,
+        /// Output file path (defaults to input filename without .age extension)
+        #[arg(short, long, value_name = "FILE")]
+        output: Option<PathBuf>,
     },
 
-    /// Encrypt and send files to a GitHub user as a private Gist
+    /// Encrypt and send a file to a GitHub user as a private Gist
     Send {
-        /// Files to encrypt and send
-        #[arg(required = true, num_args = 1..)]
-        files: Vec<PathBuf>,
+        /// File to encrypt and send
+        file: PathBuf,
 
         /// GitHub username(s) of the recipient(s)
         #[arg(short, long, value_name = "USERNAME", required = true, action = clap::ArgAction::Append)]
@@ -65,7 +63,7 @@ pub enum Command {
         token: Option<String>,
     },
 
-    /// Decrypt and extract files from a nvlp Gist
+    /// Decrypt a file from a nvlp Gist
     Open {
         /// URL of the Gist to open (e.g. https://gist.github.com/user/abc123)
         url: String,
@@ -74,9 +72,9 @@ pub enum Command {
         #[arg(short, long, value_name = "FILE")]
         identity: Option<PathBuf>,
 
-        /// Directory to extract files into
-        #[arg(short, long, value_name = "DIR", default_value = ".")]
-        output: PathBuf,
+        /// Output file path (defaults to nvlp)
+        #[arg(short, long, value_name = "FILE")]
+        output: Option<PathBuf>,
     },
 
     /// List a GitHub user's SSH public keys
