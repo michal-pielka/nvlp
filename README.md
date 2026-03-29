@@ -47,37 +47,38 @@ Encrypt for multiple recipients:
 nvlp encrypt secret.env --to alice --to bob
 ```
 
-Encrypt multiple files (they get bundled into a tar archive):
-
-```bash
-nvlp encrypt report.pdf notes.txt --to alice
-# -> nvlp.age
-```
-
 Specify a custom output path:
 
 ```bash
 nvlp encrypt secret.env --to alice -o secrets.age
 ```
 
+To encrypt multiple files, bundle them first:
+
+```bash
+tar czf bundle.tar.gz file1.txt file2.txt
+nvlp encrypt bundle.tar.gz --to alice
+```
+
 ### Decrypt a file
 
 ```bash
 nvlp decrypt secret.env.age
+# -> secret.env
 ```
 
-Specify a different SSH key or output directory:
+Specify a different SSH key or output file:
 
 ```bash
 nvlp decrypt secret.env.age \
   --identity ~/.ssh/id_rsa \
-  --output ~/downloads
+  --output decrypted.env
 ```
 
 ### Send via GitHub Gist
 
-If you want nvlp to handle delivery too, use `send`. It encrypts the file, uploads it
-as a private Gist, and notifies the recipient with a comment.
+If you want nvlp to handle delivery too, use `send`. It encrypts the file and uploads it
+as a private Gist.
 
 ```bash
 nvlp send secret.env --to alice
@@ -99,16 +100,19 @@ nvlp send secret.env --to alice \
 
 ### Open a Gist
 
+The `open` command fetches the gist, decrypts it, and restores the original filename:
+
 ```bash
 nvlp open https://gist.github.com/bob/abc123def456
+# -> secret.env (original filename preserved)
 ```
 
-Specify a different SSH key or output directory:
+Specify a different SSH key or output file:
 
 ```bash
 nvlp open https://gist.github.com/bob/abc123def456 \
   --identity ~/.ssh/id_rsa \
-  --output ~/downloads
+  --output secret.env
 ```
 
 ### Look up someone's keys
@@ -121,8 +125,8 @@ nvlp keys alice
 
 The `encrypt`, `decrypt`, and `keys` commands need no authentication at all.
 
-The `send` and `open` commands interact with GitHub Gists. To create Gists on your behalf,
-nvlp needs a GitHub token. It checks these sources in order:
+The `send` and `open` commands interact with the GitHub API. nvlp needs a GitHub token,
+which it checks for in this order:
 
 1. The `--token` flag
 2. The `GITHUB_TOKEN` environment variable
@@ -159,7 +163,7 @@ The sender never sees or handles private keys. GitHub acts as a public key direc
 
 ```
 nvlp/
-  nvlp-core/   # Library: encryption, archiving, GitHub API
+  nvlp-core/   # Library: encryption, GitHub API
   nvlp/        # Binary: the 'nvlp' command
 ```
 
