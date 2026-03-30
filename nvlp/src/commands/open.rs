@@ -12,7 +12,12 @@ pub fn handle(
     stdout: bool,
     token: Option<&str>,
 ) -> anyhow::Result<()> {
-    let gist_id = url.trim_end_matches('/').rsplit('/').next().unwrap();
+    let gist_id = url
+        .trim_end_matches('/')
+        .rsplit('/')
+        .next()
+        .filter(|s| !s.is_empty())
+        .ok_or_else(|| anyhow::anyhow!("invalid gist URL: {url}"))?;
 
     let token = github::resolve_token(token)?;
     let gist_file = github::fetch_gist(gist_id, &token)?;

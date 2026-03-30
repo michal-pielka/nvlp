@@ -21,7 +21,10 @@ pub fn handle(
 
     let token = github::resolve_token(token)?;
 
-    let mut filename = file.file_name().unwrap().to_os_string();
+    let mut filename = file
+        .file_name()
+        .ok_or_else(|| anyhow::anyhow!("invalid file path: {}", file.display()))?
+        .to_os_string();
     filename.push(".age");
     let filename = filename.to_string_lossy();
 
