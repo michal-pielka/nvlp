@@ -33,7 +33,7 @@ pub fn handle(
     };
 
     std::fs::write(&output_path, &plaintext)?;
-    println!("Decrypted to {}", output_path.display());
+    eprintln!("Decrypted to {}", output_path.display());
 
     Ok(())
 }

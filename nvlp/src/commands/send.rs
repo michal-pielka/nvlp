@@ -41,7 +41,7 @@ pub fn handle(
         github::comment_on_gist(&gist, recipient, comment, &token)?;
     }
 
-    println!("Secret sent to @{recipients}\n{}", gist.html_url);
+    eprintln!("Secret sent to @{recipients}\n{}", gist.html_url);
 
     Ok(())
 }
