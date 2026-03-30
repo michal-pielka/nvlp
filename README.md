@@ -9,12 +9,12 @@ https://github.com/user-attachments/assets/6b419cf9-5a13-42d6-bb3c-3ee2b066422a
 
 ## How it works
 
-1. You run `nvlp encrypt secret.env --to alice`
+1. You run `nvlp encrypt secret.env --to alice -o secret.env.age`
 2. nvlp fetches Alice's SSH public keys from GitHub
 3. Your file is encrypted using [age](https://github.com/FiloSottile/age) with those keys
 4. You get `secret.env.age` and send it however you want (Slack, email, etc.)
 
-Alice runs `nvlp decrypt secret.env.age` and the file is decrypted with her local SSH private key.
+Alice runs `nvlp decrypt secret.env.age -o secret.env` and the file is decrypted with her local SSH private key.
 
 That's it. No PGP, no key servers, no pre-shared secrets.
 
@@ -37,42 +37,56 @@ cargo install nvlp
 ### Encrypt a file
 
 ```bash
-nvlp encrypt secret.env --to alice
-# -> secret.env.age
+nvlp encrypt secret.env --to alice -o secret.env.age
 ```
 
 Encrypt for multiple recipients:
 
 ```bash
-nvlp encrypt secret.env --to alice --to bob
+nvlp encrypt secret.env --to alice --to bob -o secret.env.age
 ```
 
-Specify a custom output path:
+Encrypt from stdin:
 
 ```bash
-nvlp encrypt secret.env --to alice -o secrets.age
+echo "the password is hunter2" | nvlp encrypt --to alice -o message.age
+```
+
+Output defaults to stdout, so you can pipe or redirect:
+
+```bash
+nvlp encrypt secret.env --to alice > secret.env.age
 ```
 
 To encrypt multiple files, bundle them first:
 
 ```bash
 tar czf bundle.tar.gz file1.txt file2.txt
-nvlp encrypt bundle.tar.gz --to alice
+nvlp encrypt bundle.tar.gz --to alice -o bundle.tar.gz.age
 ```
 
 ### Decrypt a file
 
 ```bash
-nvlp decrypt secret.env.age
-# -> secret.env
+nvlp decrypt secret.env.age -o secret.env
 ```
 
-Specify a different SSH key or output file:
+Decrypt from stdin:
 
 ```bash
-nvlp decrypt secret.env.age \
-  --identity ~/.ssh/id_rsa \
-  --output decrypted.env
+cat secret.env.age | nvlp decrypt -o secret.env
+```
+
+Output defaults to stdout, so you can pipe to other tools:
+
+```bash
+nvlp decrypt secret.json.age | jq '.api_key'
+```
+
+Specify a different SSH key:
+
+```bash
+nvlp decrypt secret.env.age --identity ~/.ssh/id_rsa -o secret.env
 ```
 
 ### Send via GitHub Gist
@@ -105,6 +119,12 @@ The `open` command fetches the gist, decrypts it, and restores the original file
 ```bash
 nvlp open https://gist.github.com/bob/abc123def456
 # -> secret.env (original filename preserved)
+```
+
+Print to stdout instead of saving:
+
+```bash
+nvlp open https://gist.github.com/bob/abc123def456 --stdout
 ```
 
 Specify a different SSH key or output file:
