@@ -5,7 +5,7 @@
 Encrypt files to any GitHub user. No key exchange, no setup, no accounts to create.
 If they have SSH keys on GitHub, you can encrypt a file for them.
 
-https://github.com/user-attachments/assets/6b419cf9-5a13-42d6-bb3c-3ee2b066422a
+[![asciicast](https://asciinema.org/a/q9a0azpcKkoPYIXx.svg)](https://asciinema.org/a/q9a0azpcKkoPYIXx?speed=1.3)
 
 ## How it works
 
