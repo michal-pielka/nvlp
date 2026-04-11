@@ -23,7 +23,7 @@ That's it. No PGP, no key servers, no pre-shared secrets.
 ### From source
 
 ```bash
-cargo install --path nvlp
+cargo install --path cli
 ```
 
 ### From crates.io
@@ -183,8 +183,8 @@ The sender never sees or handles private keys. GitHub acts as a public key direc
 
 ```
 nvlp/
-  nvlp-core/   # Library: encryption, GitHub API
-  nvlp/        # Binary: the 'nvlp' command
+  core/   # Library: encryption, GitHub API
+  cli/    # Binary: the 'nvlp' command
 ```
 
 ## Contributing

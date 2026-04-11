@@ -1,3 +1,3 @@
 [workspace]
-members = ["nvlp-core", "nvlp"]
+members = ["core", "cli"]
 resolver = "3"
