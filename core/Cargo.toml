@@ -1,10 +1,10 @@
 [package]
 name = "nvlp-core"
-version = "0.3.1"
+version = "0.3.2"
 edition = "2024"
 description = "Core library for nvlp: encrypt files to GitHub users via their SSH keys"
 license = "MIT"
-repository = "https://github.com/michalpielka/nvlp"
+repository = "https://github.com/michal-pielka/nvlp"
 keywords = ["encryption", "age", "ssh", "github", "security"]
 categories = ["cryptography", "authentication"]
 
